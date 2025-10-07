@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EaseServe APP · 服务工单体验 Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Han+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-icon">ES</div>
+        <div>
+          <h1>EaseServe</h1>
+          <p>企业级售后服务工单系统</p>
+        </div>
+      </div>
+      <nav class="sidebar-nav" id="sidebarNav"></nav>
+      <footer class="sidebar-footer">
+        <p>版本：概念 Demo 0.1</p>
+        <p>适配设备：PC、平板（外勤工程师）</p>
+      </footer>
+    </aside>
+    <main class="content">
+      <header class="hero" id="section-intro">
+        <div class="hero-text">
+          <p class="hero-tag">方案预览 · 讨论稿</p>
+          <h2>EaseServe APP</h2>
+          <p class="hero-subtitle">围绕“上门维修电脑”场景，打造轻量、可靠的工单闭环体验，帮助售后工程师高效完成服务任务。</p>
+          <div class="hero-actions">
+            <button class="btn primary" data-scroll="section-flow">查看工单流程</button>
+            <button class="btn ghost" data-scroll="section-dashboard">体验界面 Demo</button>
+          </div>
+        </div>
+        <div class="hero-preview">
+          <div class="device-frame">
+            <div class="status-bar">
+              <span>09:41</span>
+              <div class="status-icons">
+                <span>📶</span>
+                <span>📡</span>
+                <span>🔋</span>
+              </div>
+            </div>
+            <div class="device-body">
+              <div class="device-header">
+                <div>
+                  <h3>今日工单</h3>
+                  <p>共 4 条 · 待上门 2 · 待填写 1</p>
+                </div>
+                <button class="btn ghost compact">+ 新建</button>
+              </div>
+              <div class="device-search">
+                <input type="text" placeholder="搜索客户 / 工单号" disabled>
+              </div>
+              <ul class="device-list" id="mobileTickets"></ul>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <section class="section" id="section-objectives">
+        <h3>产品目标</h3>
+        <div class="grid three">
+          <article class="card highlight">
+            <h4>工单全流程可视</h4>
+            <p>清晰呈现“派单 → 接单 → 上门 → 完结 → 评价”链路，降低沟通成本，提升服务透明度。</p>
+          </article>
+          <article class="card highlight">
+            <h4>工程师行动指引</h4>
+            <p>以任务卡、步骤清单、客户信息三位一体的方式，确保工程师快速准备、规范执行。</p>
+          </article>
+          <article class="card highlight">
+            <h4>管理可控可追踪</h4>
+            <p>通过实时状态与数据面板，支撑调度、质量、备件等多维管理需求。</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="section-flow">
+        <div class="section-header">
+          <h3>工单生命周期</h3>
+          <p>结合思维导图梳理，覆盖从需求受理、外勤执行到闭环反馈的端到端流程。</p>
+        </div>
+        <div class="timeline" id="timeline"></div>
+      </section>
+
+      <section class="section" id="section-dashboard">
+        <div class="section-header">
+          <h3>首页总览</h3>
+          <p>PC 端调度中心界面，实时掌握工程师状态与工单分布。</p>
+        </div>
+        <div class="dashboard">
+          <div class="dashboard-main">
+            <div class="stat-grid" id="stats"></div>
+            <div class="card table-card">
+              <div class="card-header">
+                <h4>今日关键工单</h4>
+                <div class="filters">
+                  <button class="chip active" data-filter="all">全部</button>
+                  <button class="chip" data-filter="onsite">待上门</button>
+                  <button class="chip" data-filter="in-progress">进行中</button>
+                  <button class="chip" data-filter="pending">待反馈</button>
+                </div>
+              </div>
+              <table class="data-table" id="ticketTable">
+                <thead>
+                  <tr>
+                    <th>工单号</th>
+                    <th>客户</th>
+                    <th>故障描述</th>
+                    <th>服务工程师</th>
+                    <th>状态</th>
+                    <th>预约时间</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+          <aside class="dashboard-side">
+            <article class="card">
+              <h4>工程师工作台</h4>
+              <ul class="checklist" id="checklist"></ul>
+            </article>
+            <article class="card">
+              <h4>备件库存提醒</h4>
+              <ul class="stock-list" id="stockList"></ul>
+            </article>
+          </aside>
+        </div>
+      </section>
+
+      <section class="section" id="section-onsite">
+        <div class="section-header">
+          <h3>现场服务步骤</h3>
+          <p>指导工程师从到场签到到完工确认的关键动作，确保服务质量可追踪。</p>
+        </div>
+        <div class="stepper" id="stepper"></div>
+      </section>
+
+      <section class="section" id="section-customer">
+        <div class="section-header">
+          <h3>客户与资产信息</h3>
+          <p>集中展示客户档案、设备资产、服务记录，便于上门前快速熟悉背景。</p>
+        </div>
+        <div class="customer-pane">
+          <div class="card customer-card" id="customerCard"></div>
+          <div class="card history-card" id="history"></div>
+        </div>
+      </section>
+
+      <section class="section" id="section-support">
+        <div class="section-header">
+          <h3>系统支持能力</h3>
+          <p>结合思维导图，拆解运营、管理、数据等后台需求。</p>
+        </div>
+        <div class="grid two">
+          <article class="card">
+            <h4>运营 &amp; 管理</h4>
+            <ul class="bullet-list">
+              <li>调度中心：工单分派、进度追踪、路线规划。</li>
+              <li>人员管理：排班、技能标签、考勤打卡。</li>
+              <li>知识库：常见故障方案、现场操作指引。</li>
+              <li>客户反馈闭环：满意度收集、复盘改进。</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h4>数据 &amp; 系统</h4>
+            <ul class="bullet-list">
+              <li>数据看板：工单量、响应时长、一次修复率。</li>
+              <li>备件管理：库存预警、领用记录、成本核算。</li>
+              <li>系统集成：对接 CRM / ERP / 采购平台。</li>
+              <li>安全合规：操作留痕、权限体系、数据加密。</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <footer class="section footer" id="section-next">
+        <h3>下一步规划</h3>
+        <div class="grid three">
+          <article class="card">
+            <h4>需求确认</h4>
+            <p>与业务团队复核流程细节、指标口径，确认 MVP 范围。</p>
+          </article>
+          <article class="card">
+            <h4>交互原型</h4>
+            <p>输出桌面端与移动端高保真原型，明确信息层级与交互。</p>
+          </article>
+          <article class="card">
+            <h4>技术选型</h4>
+            <p>评估 App Shell、离线能力、地图定位、消息推送等关键技术方案。</p>
+          </article>
+        </div>
+        <p class="footer-note">本 Demo 仅用于讨论，具体功能及数据以正式版本为准。</p>
+      </footer>
+    </main>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
