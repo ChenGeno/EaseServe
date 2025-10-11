@@ -1,0 +1,6 @@
+.DS_Store
+prototype_by_flutter/.DS_Store
+
+# Flutter build artifacts
+prototype_by_flutter/.dart_tool/
+prototype_by_flutter/build/
