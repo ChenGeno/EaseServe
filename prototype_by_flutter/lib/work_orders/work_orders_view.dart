@@ -247,6 +247,17 @@ class _TitleAndActionsRow extends StatelessWidget {
             ),
           ),
           Align(
+            alignment: Alignment.centerLeft,
+            child: Builder(
+              builder: (context) => _HeaderDrawerButton(
+                onPressed: () {
+                  final scaffoldState = Scaffold.maybeOf(context);
+                  scaffoldState?.openDrawer();
+                },
+              ),
+            ),
+          ),
+          Align(
             alignment: Alignment.centerRight,
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -278,6 +289,28 @@ class _HeaderIconButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
       ),
       child: Icon(icon, color: Colors.white),
+    );
+  }
+}
+
+class _HeaderDrawerButton extends StatelessWidget {
+  final VoidCallback onPressed;
+
+  const _HeaderDrawerButton({required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onPressed,
+      child: Container(
+        height: 36,
+        width: 36,
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.25),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: const Icon(Icons.menu, color: Colors.white),
+      ),
     );
   }
 }

@@ -4,6 +4,7 @@ import '../ai_helper/ai_helper_view.dart';
 import '../community/community_view.dart';
 import '../profile/profile_view.dart';
 import '../study/study_view.dart';
+import '../work_orders/work_orders_drawer.dart';
 import '../work_orders/work_orders_view.dart';
 
 class EaseServeHomePage extends StatefulWidget {
@@ -44,6 +45,8 @@ class _EaseServeHomePageState extends State<EaseServeHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: _scaffoldColor,
+      drawerEnableOpenDragGesture: _selectedIndex == 0,
+      drawer: _selectedIndex == 0 ? const WorkOrdersDrawer() : null,
       body: SafeArea(
         child: _buildBody(),
       ),

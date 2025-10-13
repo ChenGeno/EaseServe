@@ -147,6 +147,16 @@ class _ProfileMenu extends StatelessWidget {
         title: '点评',
       ),
       _ProfileMenuItemData(
+        icon: Icons.fact_check_outlined,
+        iconColor: Color(0xFF5C6BC0),
+        title: '我要吐槽',
+      ),
+      _ProfileMenuItemData(
+        icon: Icons.help_outline,
+        iconColor: Color(0xFF26A69A),
+        title: '常见问题',
+      ),
+      _ProfileMenuItemData(
         icon: Icons.info_outline,
         iconColor: Color(0xFF2ECC71),
         title: '关于',
