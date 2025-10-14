@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../ai_helper/ai_helper_view.dart';
 import '../community/community_view.dart';
-import '../profile/profile_view.dart';
 import '../study/study_view.dart';
 import '../work_orders/work_orders_drawer.dart';
 import '../work_orders/work_orders_view.dart';
@@ -34,8 +33,6 @@ class _EaseServeHomePageState extends State<EaseServeHomePage> {
         return const StudyView();
       case 3:
         return const CommunityView();
-      case 4:
-        return const ProfileView();
       default:
         return const SizedBox();
     }
@@ -95,10 +92,6 @@ class EaseServeBottomNav extends StatelessWidget {
         BottomNavigationBarItem(
           icon: Icon(Icons.forum_outlined),
           label: '社区',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.person_outline),
-          label: '我的',
         ),
       ],
     );

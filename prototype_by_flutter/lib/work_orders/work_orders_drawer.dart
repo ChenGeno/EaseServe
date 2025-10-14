@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../settings/app_settings_page.dart';
+
 class WorkOrdersDrawer extends StatelessWidget {
   const WorkOrdersDrawer({super.key});
 
@@ -342,8 +344,17 @@ class _DrawerSettingsButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final navigator = Navigator.of(context);
+
     return OutlinedButton(
-      onPressed: () {},
+      onPressed: () {
+        navigator.pop();
+        navigator.push(
+          MaterialPageRoute(
+            builder: (_) => const AppSettingsPage(),
+          ),
+        );
+      },
       style: OutlinedButton.styleFrom(
         padding: const EdgeInsets.symmetric(vertical: 14),
         shape: RoundedRectangleBorder(

@@ -66,18 +66,6 @@ class _DetailHeader extends StatelessWidget {
                 icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
                 onPressed: () => Navigator.of(context).pop(),
               ),
-              const Spacer(),
-              const CircleAvatar(
-                radius: 14,
-                backgroundColor: Color(0x33000000),
-                child: Icon(Icons.person, size: 16, color: Colors.white),
-              ),
-              const SizedBox(width: 8),
-              const CircleAvatar(
-                radius: 14,
-                backgroundColor: Color(0x33000000),
-                child: Icon(Icons.sync, size: 16, color: Colors.white),
-              ),
             ],
           ),
           const SizedBox(height: 18),
@@ -210,7 +198,24 @@ class _WorkInfoCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 18),
-          const _QuickActionButtons(),
+          const _QuickActionButtons(
+            actions: [
+              _QuickAction(
+                icon: Icons.lightbulb_outline,
+                label: '智能推荐',
+                badgeColor: Color(0xFFF6655A),
+              ),
+              _QuickAction(
+                icon: Icons.notifications_active_outlined,
+                label: 'SLA提醒',
+                badgeColor: Color(0xFFF6A21A),
+              ),
+              _QuickAction(
+                icon: Icons.sticky_note_2_outlined,
+                label: '工单详情',
+              ),
+            ],
+          ),
         ],
       ),
     );
@@ -277,27 +282,12 @@ class _InfoRow extends StatelessWidget {
 }
 
 class _QuickActionButtons extends StatelessWidget {
-  const _QuickActionButtons();
+  final List<_QuickAction> actions;
+
+  const _QuickActionButtons({required this.actions});
 
   @override
   Widget build(BuildContext context) {
-    const actions = [
-      _QuickAction(
-        icon: Icons.lightbulb_outline,
-        label: '智能推荐',
-        badgeColor: Color(0xFFF6655A),
-      ),
-      _QuickAction(
-        icon: Icons.notifications_active_outlined,
-        label: 'SLA提醒',
-        badgeColor: Color(0xFFF6A21A),
-      ),
-      _QuickAction(
-        icon: Icons.sticky_note_2_outlined,
-        label: '更多',
-      ),
-    ];
-
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
       decoration: BoxDecoration(
@@ -437,48 +427,23 @@ class _CustomerInfoCard extends StatelessWidget {
           const SizedBox(height: 12),
           _InfoRow(label: '上门地址', value: order.address),
           const SizedBox(height: 20),
-          Row(
-            children: const [
-              _CustomerActionButton(
-                  icon: Icons.navigation_outlined, label: '导航'),
-              SizedBox(width: 12),
-              _CustomerActionButton(icon: Icons.phone_outlined, label: '联系'),
-              SizedBox(width: 12),
-              _CustomerActionButton(icon: Icons.edit_outlined, label: '修改'),
+          const _QuickActionButtons(
+            actions: [
+              _QuickAction(
+                icon: Icons.navigation_outlined,
+                label: '导航',
+              ),
+              _QuickAction(
+                icon: Icons.phone_outlined,
+                label: '联系',
+              ),
+              _QuickAction(
+                icon: Icons.edit_outlined,
+                label: '修改',
+              ),
             ],
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _CustomerActionButton extends StatelessWidget {
-  final IconData icon;
-  final String label;
-
-  const _CustomerActionButton({required this.icon, required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: OutlinedButton.icon(
-        onPressed: () {},
-        icon: Icon(icon, color: const Color(0xFF2A8BF2), size: 18),
-        label: Text(
-          label,
-          style: const TextStyle(
-            color: Color(0xFF2A8BF2),
-            fontSize: 13,
-          ),
-        ),
-        style: OutlinedButton.styleFrom(
-          side: const BorderSide(color: Color(0xFFCCE0FF)),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
-          ),
-          padding: const EdgeInsets.symmetric(vertical: 10),
-        ),
       ),
     );
   }

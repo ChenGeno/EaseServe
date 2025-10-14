@@ -110,13 +110,26 @@ class _WorkOrdersViewState extends State<WorkOrdersView> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const _WorkOrderFilters(),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: _DispatchSearchField(),
+            ),
             const SizedBox(height: 16),
             _WorkOrderSection(orders: _inServiceOrders),
           ],
         );
       case 1:
-        return const _WorkOrdersMessage(message: '已完成工单内容待补充');
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: _DispatchSearchField(),
+            ),
+            const SizedBox(height: 16),
+            const _WorkOrdersMessage(message: '已完成工单内容待补充'),
+          ],
+        );
       case 2:
         return const _DispatchListSection(orders: _dispatchOrders);
       default:
@@ -262,8 +275,6 @@ class _TitleAndActionsRow extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: const [
-                _HeaderIconButton(icon: Icons.filter_list),
-                SizedBox(width: 12),
                 _HeaderIconButton(icon: Icons.chat_bubble_outline),
               ],
             ),
@@ -414,63 +425,6 @@ class _InfoBadge extends StatelessWidget {
           fontSize: 12,
           color: Color(0xFF2A8BF2),
           fontWeight: FontWeight.w600,
-        ),
-      ),
-    );
-  }
-}
-
-class _WorkOrderFilters extends StatelessWidget {
-  const _WorkOrderFilters();
-
-  @override
-  Widget build(BuildContext context) {
-    const filters = ['全部工单', 'SFB工单', 'SF工单'];
-
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Row(
-        children: [
-          for (var i = 0; i < filters.length; i++) ...[
-            _FilterChip(
-              label: filters[i],
-              isActive: i == 0,
-            ),
-            if (i != filters.length - 1) const SizedBox(width: 10),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-class _FilterChip extends StatelessWidget {
-  final String label;
-  final bool isActive;
-
-  const _FilterChip({
-    required this.label,
-    required this.isActive,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-      decoration: BoxDecoration(
-        color: isActive ? const Color(0xFF2A8BF2) : Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: isActive ? const Color(0xFF2A8BF2) : const Color(0xFFE1E4EB),
-        ),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-          color: isActive ? Colors.white : const Color(0xFF5B6574),
         ),
       ),
     );
@@ -751,12 +705,81 @@ class _DispatchListSection extends StatelessWidget {
   }
 }
 
-class _DispatchSearchField extends StatelessWidget {
+class _DispatchSearchField extends StatefulWidget {
   const _DispatchSearchField();
+
+  @override
+  State<_DispatchSearchField> createState() => _DispatchSearchFieldState();
+}
+
+class _DispatchSearchFieldState extends State<_DispatchSearchField> {
+  final GlobalKey _fieldKey = GlobalKey();
+  OverlayEntry? _overlayEntry;
+  bool get _isOverlayVisible => _overlayEntry != null;
+
+  @override
+  void dispose() {
+    _removeOverlay();
+    super.dispose();
+  }
+
+  void _toggleOverlay() {
+    if (_isOverlayVisible) {
+      _removeOverlay();
+    } else {
+      _showOverlay();
+    }
+  }
+
+  void _showOverlay() {
+    final renderBox =
+        _fieldKey.currentContext?.findRenderObject() as RenderBox?;
+    if (renderBox == null) return;
+
+    final size = renderBox.size;
+    final offset = renderBox.localToGlobal(Offset.zero);
+
+    _overlayEntry = OverlayEntry(
+      builder: (context) {
+        return GestureDetector(
+          onTap: _removeOverlay,
+          behavior: HitTestBehavior.translucent,
+          child: Stack(
+            children: [
+              Positioned(
+                left: offset.dx,
+                top: offset.dy + size.height + 8,
+                width: size.width,
+                child: GestureDetector(
+                  onTap: () {},
+                  child: Material(
+                    color: Colors.transparent,
+                    child: _DispatchFilterDropdown(
+                      onClose: _removeOverlay,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+
+    Overlay.of(context, rootOverlay: true)?.insert(_overlayEntry!);
+    setState(() {});
+  }
+
+  void _removeOverlay() {
+    _overlayEntry?.remove();
+    _overlayEntry = null;
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
     return Container(
+      key: _fieldKey,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(24),
@@ -770,10 +793,10 @@ class _DispatchSearchField extends StatelessWidget {
       ),
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
       child: Row(
-        children: const [
-          Icon(Icons.search, color: Color(0xFF9AA3B1)),
-          SizedBox(width: 10),
-          Expanded(
+        children: [
+          const Icon(Icons.search, color: Color(0xFF9AA3B1)),
+          const SizedBox(width: 10),
+          const Expanded(
             child: Text(
               '请输入工单编号',
               style: TextStyle(
@@ -782,7 +805,394 @@ class _DispatchSearchField extends StatelessWidget {
               ),
             ),
           ),
+          Container(
+            height: 24,
+            width: 1,
+            color: const Color(0xFFE3E8F0),
+          ),
+          const SizedBox(width: 12),
+          GestureDetector(
+            onTap: _toggleOverlay,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: _isOverlayVisible
+                    ? const Color(0xFF2A8BF2).withOpacity(0.08)
+                    : Colors.transparent,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                children: const [
+                  Icon(
+                    Icons.filter_list,
+                    color: Color(0xFF2A8BF2),
+                    size: 20,
+                  ),
+                  SizedBox(width: 6),
+                  Text(
+                    '筛选',
+                    style: TextStyle(
+                      color: Color(0xFF2A8BF2),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
+      ),
+    );
+  }
+}
+
+class _DispatchFilterDropdown extends StatefulWidget {
+  final VoidCallback onClose;
+
+  const _DispatchFilterDropdown({required this.onClose});
+
+  @override
+  State<_DispatchFilterDropdown> createState() =>
+      _DispatchFilterDropdownState();
+}
+
+class _DispatchFilterDropdownState extends State<_DispatchFilterDropdown> {
+  final Set<String> _selectedSources = <String>{};
+  String? _quickRange;
+
+  void _toggleSource(String label) {
+    setState(() {
+      if (_selectedSources.contains(label)) {
+        _selectedSources.remove(label);
+      } else {
+        _selectedSources.add(label);
+      }
+    });
+  }
+
+  void _toggleQuickRange(String label) {
+    setState(() {
+      _quickRange = _quickRange == label ? null : label;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {},
+      behavior: HitTestBehavior.translucent,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x1A000000),
+              blurRadius: 18,
+              offset: Offset(0, 10),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.fromLTRB(18, 18, 18, 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const _FilterSectionTitle('工单来源'),
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 12,
+              runSpacing: 8,
+              children: [
+                _FilterChoiceChip(
+                  label: 'SF工单',
+                  isSelected: _selectedSources.contains('SF工单'),
+                  onTap: () => _toggleSource('SF工单'),
+                ),
+                _FilterChoiceChip(
+                  label: 'SFB工单',
+                  isSelected: _selectedSources.contains('SFB工单'),
+                  onTap: () => _toggleSource('SFB工单'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            const _FilterSectionTitle('客户名称'),
+            const SizedBox(height: 12),
+            const _FilterTextField(hintText: '请输入'),
+            const SizedBox(height: 16),
+            const _FilterSectionTitle('客户电话'),
+            const SizedBox(height: 12),
+            const _FilterTextField(hintText: '请输入'),
+            const SizedBox(height: 16),
+            const _FilterSectionTitle('开单时间范围'),
+            const SizedBox(height: 12),
+            Row(
+              children: const [
+                Expanded(
+                  child: _FilterDateField(hintText: '请选择开始时间'),
+                ),
+                SizedBox(width: 12),
+                Text(
+                  '至',
+                  style: TextStyle(
+                    color: Color(0xFF6F7C8F),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                SizedBox(width: 12),
+                Expanded(
+                  child: _FilterDateField(hintText: '请选择结束时间'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 12,
+              runSpacing: 10,
+              children: [
+                _QuickRangeButton(
+                  label: '今天',
+                  isSelected: _quickRange == '今天',
+                  onTap: () => _toggleQuickRange('今天'),
+                ),
+                _QuickRangeButton(
+                  label: '昨天',
+                  isSelected: _quickRange == '昨天',
+                  onTap: () => _toggleQuickRange('昨天'),
+                ),
+                _QuickRangeButton(
+                  label: '近三天',
+                  isSelected: _quickRange == '近三天',
+                  onTap: () => _toggleQuickRange('近三天'),
+                ),
+                _QuickRangeButton(
+                  label: '近七天',
+                  isSelected: _quickRange == '近七天',
+                  onTap: () => _toggleQuickRange('近七天'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 18),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () {
+                      setState(() {
+                        _selectedSources.clear();
+                        _quickRange = null;
+                      });
+                    },
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      side: const BorderSide(color: Color(0xFFCBD3E1)),
+                    ),
+                    child: const Text(
+                      '重置',
+                      style: TextStyle(
+                        color: Color(0xFF6F7C8F),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: widget.onClose,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF2A8BF2),
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                    child: const Text(
+                      '确认',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _FilterSectionTitle extends StatelessWidget {
+  final String title;
+
+  const _FilterSectionTitle(this.title);
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      title,
+      style: const TextStyle(
+        fontSize: 15,
+        fontWeight: FontWeight.w700,
+        color: Color(0xFF384250),
+      ),
+    );
+  }
+}
+
+class _FilterChoiceChip extends StatelessWidget {
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _FilterChoiceChip({
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFFE8F1FF) : Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color:
+                isSelected ? const Color(0xFF2A8BF2) : const Color(0xFFCBD3E1),
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color:
+                isSelected ? const Color(0xFF2A8BF2) : const Color(0xFF566173),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _FilterTextField extends StatelessWidget {
+  final String hintText;
+
+  const _FilterTextField({required this.hintText});
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      decoration: InputDecoration(
+        hintText: hintText,
+        hintStyle: const TextStyle(
+          color: Color(0xFFB0B8C6),
+          fontSize: 14,
+        ),
+        filled: true,
+        fillColor: const Color(0xFFF6F7FB),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: Color(0xFFE0E4ED)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: Color(0xFF2A8BF2)),
+        ),
+      ),
+    );
+  }
+}
+
+class _FilterDateField extends StatelessWidget {
+  final String hintText;
+
+  const _FilterDateField({required this.hintText});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF6F7FB),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE0E4ED)),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.calendar_today_outlined,
+              size: 16, color: Color(0xFF9AA3B1)),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              hintText,
+              style: const TextStyle(
+                fontSize: 13,
+                color: Color(0xFF9AA3B1),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _QuickRangeButton extends StatelessWidget {
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _QuickRangeButton({
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFF2A8BF2) : const Color(0xFFF6F7FB),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color:
+                isSelected ? const Color(0xFF2A8BF2) : const Color(0xFFE0E4ED),
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: isSelected ? Colors.white : const Color(0xFF566173),
+          ),
+        ),
       ),
     );
   }
