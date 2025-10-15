@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'scan_icon.dart';
+import 'scan_validation_page.dart';
 import 'work_order_detail_page.dart';
 import 'work_order_model.dart';
 
@@ -44,7 +46,7 @@ class _WorkOrdersViewState extends State<WorkOrdersView> {
       spareStatus: '未预约',
       contactPhone: '13022167706',
       tags: ['提醒'],
-      statusLabel: '待处理',
+      statusLabel: '待检验',
       statusColor: Color(0xFF2A8BF2),
     ),
     WorkOrderSummary(
@@ -61,7 +63,7 @@ class _WorkOrdersViewState extends State<WorkOrdersView> {
       spareStatus: '未预约',
       contactPhone: '13022167706',
       tags: [],
-      statusLabel: '待预约',
+      statusLabel: '检验中',
       statusColor: Color(0xFF34A853),
     ),
     WorkOrderSummary(
@@ -78,7 +80,7 @@ class _WorkOrdersViewState extends State<WorkOrdersView> {
       spareStatus: '未满足',
       contactPhone: '13022167706',
       tags: ['回访'],
-      statusLabel: '已联系',
+      statusLabel: '待处理',
       statusColor: Color(0xFF00B8A9),
     ),
     WorkOrderSummary(
@@ -95,7 +97,7 @@ class _WorkOrdersViewState extends State<WorkOrdersView> {
       spareStatus: '未预约',
       contactPhone: '13022167706',
       tags: [],
-      statusLabel: '待确认',
+      statusLabel: '待预约',
       statusColor: Color(0xFFF2994A),
     ),
   ];
@@ -177,9 +179,9 @@ class _HeaderSection extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: const [
-          _StatusBarRow(),
-          SizedBox(height: 18),
+        children: [
+          const _StatusBarRow(),
+          const SizedBox(height: 18),
           _TitleAndActionsRow(),
         ],
       ),
@@ -242,8 +244,6 @@ class _HeaderSignalDisplay extends StatelessWidget {
 }
 
 class _TitleAndActionsRow extends StatelessWidget {
-  const _TitleAndActionsRow();
-
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -274,8 +274,21 @@ class _TitleAndActionsRow extends StatelessWidget {
             alignment: Alignment.centerRight,
             child: Row(
               mainAxisSize: MainAxisSize.min,
-              children: const [
-                _HeaderIconButton(icon: Icons.chat_bubble_outline),
+              children: [
+                _HeaderIconButton(
+                  icon: const ScanIcon(size: 20),
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const ScanValidationPage(),
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(width: 12),
+                const _HeaderIconButton(
+                  icon: Icon(Icons.chat_bubble_outline, color: Colors.white),
+                ),
               ],
             ),
           ),
@@ -286,20 +299,24 @@ class _TitleAndActionsRow extends StatelessWidget {
 }
 
 class _HeaderIconButton extends StatelessWidget {
-  final IconData icon;
+  final Widget icon;
+  final VoidCallback? onTap;
 
-  const _HeaderIconButton({required this.icon});
+  const _HeaderIconButton({required this.icon, this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 36,
-      width: 36,
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.25),
-        borderRadius: BorderRadius.circular(12),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 36,
+        width: 36,
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.25),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Center(child: icon),
       ),
-      child: Icon(icon, color: Colors.white),
     );
   }
 }

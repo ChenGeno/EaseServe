@@ -151,30 +151,6 @@ class _DrawerProfileHeader extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 18),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.16),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Row(
-                children: const [
-                  Icon(Icons.verified_user_outlined,
-                      color: Colors.white, size: 20),
-                  SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      'A级服务工程师 · 已连续服务 128 天',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
           ],
         ),
       ),
