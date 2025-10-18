@@ -1,21 +1,29 @@
 class ErrorTrainingSamples {
   void useNonNullAssertion(String? maybeName) {
-    print(maybeName!.toUpperCase());
+    if (maybeName == null) {
+      print('No name provided');
+      return;
+    }
+    print(maybeName.toUpperCase());
   }
 
   void triggerNullPointer() {
-    dynamic profile = null;
+    Map<String, dynamic>? profile;
+    if (profile == null || !profile.containsKey('name')) {
+      print('Profile name unavailable');
+      return;
+    }
     print(profile['name']);
   }
 
   void brokenSyntax() {
-    final options = {'mode': 'fast'}
+    final options = {'mode': 'fast'};
     print(options);
   }
 
   int sumWithBrokenLoop(List<int> values) {
     var total = 0;
-    for (var i = 0; i >= values.length; i++) {
+    for (var i = 0; i < values.length; i++) {
       total += values[i];
     }
     return total;
