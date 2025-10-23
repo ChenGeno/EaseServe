@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+import 'engineer_badge_page.dart';
+import 'feedback_page.dart';
+import 'message_center_page.dart';
+import 'scan_validation_page.dart';
 import 'work_order_model.dart';
 
 class WorkOrderDetailPage extends StatelessWidget {
@@ -68,8 +72,8 @@ class _DetailHeader extends StatelessWidget {
                 Align(
                   alignment: Alignment.centerLeft,
                   child: IconButton(
-                    icon:
-                        const Icon(Icons.arrow_back_ios_new, color: Colors.white),
+                    icon: const Icon(Icons.arrow_back_ios_new,
+                        color: Colors.white),
                     onPressed: () => Navigator.of(context).pop(),
                   ),
                 ),
@@ -81,6 +85,7 @@ class _DetailHeader extends StatelessWidget {
                     fontWeight: FontWeight.w700,
                   ),
                 ),
+                const SizedBox.shrink(),
               ],
             ),
           ),
@@ -624,7 +629,14 @@ class _DetailBottomBar extends StatelessWidget {
       child: Row(
         children: [
           OutlinedButton.icon(
-            onPressed: () {},
+            onPressed: () {
+              showModalBottomSheet<void>(
+                context: context,
+                backgroundColor: Colors.transparent,
+                isScrollControlled: true,
+                builder: (modalContext) => _ToolDrawer(rootContext: context),
+              );
+            },
             icon: const Icon(Icons.apps, color: Color(0xFF2A8BF2)),
             label: const Text(
               '工具',
@@ -661,6 +673,212 @@ class _DetailBottomBar extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _ToolDrawer extends StatelessWidget {
+  final BuildContext rootContext;
+
+  const _ToolDrawer({required this.rootContext});
+
+  void _showPlaceholder(String label) {
+    final messenger = ScaffoldMessenger.of(rootContext);
+    messenger
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text('$label 功能正在建设中'),
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+  }
+
+  List<_ToolAction> get _actions => [
+        _ToolAction(
+          icon: Icons.category_outlined,
+          label: '约件',
+          onSelected: (_) => _showPlaceholder('约件'),
+        ),
+        _ToolAction(
+          icon: Icons.system_update_alt_outlined,
+          label: '升级处理',
+          onSelected: (_) => _showPlaceholder('升级处理'),
+        ),
+        _ToolAction(
+          icon: Icons.account_balance_wallet_outlined,
+          label: '信用转储',
+          onSelected: (_) => _showPlaceholder('信用转储'),
+        ),
+        _ToolAction(
+          icon: Icons.qr_code_scanner_outlined,
+          label: '装箱单验证',
+          onSelected: (context) {
+            Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => const ScanValidationPage(),
+              ),
+            );
+          },
+        ),
+        _ToolAction(
+          icon: Icons.storage_outlined,
+          label: '主机信息',
+          onSelected: (_) => _showPlaceholder('主机信息'),
+        ),
+        _ToolAction(
+          icon: Icons.attach_file_outlined,
+          label: '附件',
+          onSelected: (_) => _showPlaceholder('附件'),
+        ),
+        _ToolAction(
+          icon: Icons.sync_alt,
+          label: '换件',
+          onSelected: (_) => _showPlaceholder('换件'),
+        ),
+        _ToolAction(
+          icon: Icons.do_not_disturb_alt_outlined,
+          label: '非换件',
+          onSelected: (_) => _showPlaceholder('非换件'),
+        ),
+        _ToolAction(
+          icon: Icons.chat_bubble_outline,
+          label: '合法性验证工具',
+          onSelected: (_) => _showPlaceholder('合法性验证工具'),
+        ),
+        _ToolAction(
+          icon: Icons.verified_outlined,
+          label: '合法性验证',
+          onSelected: (_) => _showPlaceholder('合法性验证'),
+        ),
+      ];
+
+  @override
+  Widget build(BuildContext context) {
+    final actions = _actions;
+    final rows = (actions.length / 4).ceil();
+    final gridHeight = rows * 110.0;
+
+    return Container(
+      color: Colors.transparent,
+      child: SafeArea(
+        top: false,
+        child: Container(
+          decoration: const BoxDecoration(
+            color: Color(0xFFF6F7FB),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+          ),
+          padding: const EdgeInsets.fromLTRB(24, 18, 24, 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 48,
+                height: 5,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFD6DBE4),
+                  borderRadius: BorderRadius.circular(99),
+                ),
+              ),
+              const SizedBox(height: 22),
+              SizedBox(
+                height: gridHeight,
+                child: GridView.builder(
+                  padding: EdgeInsets.zero,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 4,
+                    crossAxisSpacing: 14,
+                    mainAxisSpacing: 18,
+                    childAspectRatio: 0.78,
+                  ),
+                  physics: rows > 2
+                      ? const BouncingScrollPhysics()
+                      : const NeverScrollableScrollPhysics(),
+                  itemCount: actions.length,
+                  itemBuilder: (context, index) => _ToolDrawerItem(
+                    action: actions[index],
+                    rootContext: rootContext,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ToolAction {
+  final IconData icon;
+  final String label;
+  final void Function(BuildContext context)? onSelected;
+
+  const _ToolAction({
+    required this.icon,
+    required this.label,
+    this.onSelected,
+  });
+}
+
+class _ToolDrawerItem extends StatelessWidget {
+  final _ToolAction action;
+  final BuildContext rootContext;
+
+  const _ToolDrawerItem({
+    required this.action,
+    required this.rootContext,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(18),
+        onTap: () {
+          final handler = action.onSelected;
+          Navigator.of(context).pop();
+          if (handler != null) {
+            Future.microtask(() => handler(rootContext));
+          }
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                height: 56,
+                width: 56,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE7F0FF),
+                  shape: BoxShape.circle,
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color(0x1A2A8BF2),
+                      blurRadius: 8,
+                      offset: Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child:
+                    Icon(action.icon, size: 24, color: const Color(0xFF2A8BF2)),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                action.label,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: const Color(0xFF4B5768),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

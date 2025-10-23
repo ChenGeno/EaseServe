@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'about_page.dart';
+
 class AppSettingsPage extends StatelessWidget {
   const AppSettingsPage({super.key});
 
@@ -17,25 +19,31 @@ class AppSettingsPage extends StatelessWidget {
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Column(
-                  children: const [
+                  children: [
                     _SettingsCard(
                       items: [
-                        _SettingsRowData(
+                        const _SettingsRowData(
                           title: '导航地图设置',
                           subtitle: '尚未选择',
                         ),
-                        _SettingsRowData(
+                        const _SettingsRowData(
                           title: '服务信息同步',
                           subtitle: '始终',
                         ),
                         _SettingsRowData(
                           title: '关于',
                           subtitle: '',
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => const AboutPage(),
+                              ),
+                            );
+                          },
                         ),
                       ],
                     ),
-                    SizedBox(height: 16),
-                    _CacheInfoCard(),
+                    const SizedBox(height: 16),
                   ],
                 ),
               ),
@@ -150,10 +158,12 @@ class _StatusBarTime extends StatelessWidget {
 class _SettingsRowData {
   final String title;
   final String subtitle;
+  final VoidCallback? onTap;
 
   const _SettingsRowData({
     required this.title,
     required this.subtitle,
+    this.onTap,
   });
 }
 
@@ -205,7 +215,7 @@ class _SettingsRow extends StatelessWidget {
     final hasSubtitle = data.subtitle.trim().isNotEmpty;
 
     return InkWell(
-      onTap: () {},
+      onTap: data.onTap,
       borderRadius: BorderRadius.circular(22),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
@@ -240,64 +250,6 @@ class _SettingsRow extends StatelessWidget {
                 size: 16, color: Color(0xFFCBD3E1)),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _CacheInfoCard extends StatelessWidget {
-  const _CacheInfoCard();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 22),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(22),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x0C000000),
-            blurRadius: 16,
-            offset: Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                Text(
-                  '清除缓存',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFF384250),
-                  ),
-                ),
-                SizedBox(height: 6),
-                Text(
-                  '包括： 图片和临时存储数据',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Color(0xFF8A94A6),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const Text(
-            '42.8M',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-              color: Color(0xFFEB5757),
-            ),
-          ),
-        ],
       ),
     );
   }

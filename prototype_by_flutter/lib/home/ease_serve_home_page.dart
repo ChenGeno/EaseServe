@@ -83,7 +83,7 @@ class EaseServeBottomNav extends StatelessWidget {
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.smart_toy_outlined),
-          label: 'AI助理',
+          label: 'AI助手',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.menu_book_outlined),

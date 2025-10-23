@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'message_center_page.dart';
 import 'scan_icon.dart';
 import 'scan_validation_page.dart';
 import 'work_order_detail_page.dart';
@@ -286,8 +287,28 @@ class _TitleAndActionsRow extends StatelessWidget {
                   },
                 ),
                 const SizedBox(width: 12),
-                const _HeaderIconButton(
-                  icon: Icon(Icons.chat_bubble_outline, color: Colors.white),
+                _HeaderIconButton(
+                  icon: Stack(
+                    clipBehavior: Clip.none,
+                    children: const [
+                      Icon(Icons.chat_bubble_outline, color: Colors.white),
+                      Positioned(
+                        top: -2,
+                        right: -2,
+                        child: CircleAvatar(
+                          radius: 4,
+                          backgroundColor: Color(0xFFE05454),
+                        ),
+                      ),
+                    ],
+                  ),
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const MessageCenterPage(),
+                      ),
+                    );
+                  },
                 ),
               ],
             ),
@@ -354,7 +375,7 @@ class _WorkStatusTabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const tabs = ['服务中', '已完成', '接单分派'];
+    const tabs = ['服务中', '服务完', '接单分派'];
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
@@ -710,7 +731,7 @@ class _DispatchListSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const _DispatchSearchField(),
+          const _DispatchSearchField(timeLabel: '开单时间范围'),
           const SizedBox(height: 16),
           for (var i = 0; i < orders.length; i++) ...[
             _DispatchOrderCard(order: orders[i]),
@@ -723,7 +744,11 @@ class _DispatchListSection extends StatelessWidget {
 }
 
 class _DispatchSearchField extends StatefulWidget {
-  const _DispatchSearchField();
+  final String timeLabel;
+
+  const _DispatchSearchField({
+    this.timeLabel = '预约服务时间范围',
+  });
 
   @override
   State<_DispatchSearchField> createState() => _DispatchSearchFieldState();
@@ -772,6 +797,7 @@ class _DispatchSearchFieldState extends State<_DispatchSearchField> {
                   child: Material(
                     color: Colors.transparent,
                     child: _DispatchFilterDropdown(
+                      timeLabel: widget.timeLabel,
                       onClose: _removeOverlay,
                     ),
                   ),
@@ -866,8 +892,12 @@ class _DispatchSearchFieldState extends State<_DispatchSearchField> {
 
 class _DispatchFilterDropdown extends StatefulWidget {
   final VoidCallback onClose;
+  final String timeLabel;
 
-  const _DispatchFilterDropdown({required this.onClose});
+  const _DispatchFilterDropdown({
+    required this.onClose,
+    required this.timeLabel,
+  });
 
   @override
   State<_DispatchFilterDropdown> createState() =>
@@ -916,24 +946,24 @@ class _DispatchFilterDropdownState extends State<_DispatchFilterDropdown> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const _FilterSectionTitle('工单来源'),
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 12,
-              runSpacing: 8,
-              children: [
-                _FilterChoiceChip(
-                  label: 'SF工单',
-                  isSelected: _selectedSources.contains('SF工单'),
-                  onTap: () => _toggleSource('SF工单'),
-                ),
-                _FilterChoiceChip(
-                  label: 'SFB工单',
-                  isSelected: _selectedSources.contains('SFB工单'),
-                  onTap: () => _toggleSource('SFB工单'),
-                ),
-              ],
-            ),
+            // const _FilterSectionTitle('工单来源'),
+            // const SizedBox(height: 12),
+            // Wrap(
+            //   spacing: 12,
+            //   runSpacing: 8,
+            //   children: [
+            //     _FilterChoiceChip(
+            //       label: 'SF工单',
+            //       isSelected: _selectedSources.contains('SF工单'),
+            //       onTap: () => _toggleSource('SF工单'),
+            //     ),
+            //     _FilterChoiceChip(
+            //       label: 'SFB工单',
+            //       isSelected: _selectedSources.contains('SFB工单'),
+            //       onTap: () => _toggleSource('SFB工单'),
+            //     ),
+            //   ],
+            // ),
             const SizedBox(height: 16),
             const _FilterSectionTitle('客户名称'),
             const SizedBox(height: 12),
@@ -943,7 +973,7 @@ class _DispatchFilterDropdownState extends State<_DispatchFilterDropdown> {
             const SizedBox(height: 12),
             const _FilterTextField(hintText: '请输入'),
             const SizedBox(height: 16),
-            const _FilterSectionTitle('开单时间范围'),
+            _FilterSectionTitle(widget.timeLabel),
             const SizedBox(height: 12),
             Row(
               children: const [

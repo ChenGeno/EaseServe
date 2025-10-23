@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 
 import '../settings/app_settings_page.dart';
+import 'engineer_badge_page.dart';
+import 'feedback_page.dart';
+import 'host_info_page.dart';
+import 'scan_validation_page.dart';
+import 'faq_page.dart';
+import 'work_order_review_page.dart';
 
 class WorkOrdersDrawer extends StatelessWidget {
   const WorkOrdersDrawer({super.key});
@@ -17,13 +23,16 @@ class WorkOrdersDrawer extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const SizedBox(height: 16),
-            const _DrawerProfileHeader(),
+            _DrawerProfileHeader(
+              onBadgeTap: () => _openBadge(context),
+              onBadgeButtonTap: () => _openBadge(context),
+            ),
             const SizedBox(height: 20),
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Column(
-                  children: const [
+                  children: [
                     _DrawerSection(
                       title: '常用工具',
                       columns: 3,
@@ -31,21 +40,24 @@ class WorkOrdersDrawer extends StatelessWidget {
                         _DrawerMenuItemData(
                           icon: Icons.desktop_windows_outlined,
                           label: '主机信息',
-                          accentColor: Color(0xFF2A8BF2),
+                          accentColor: const Color(0xFF2A8BF2),
+                          onSelected: _openHostInfo,
                         ),
                         _DrawerMenuItemData(
                           icon: Icons.assignment_turned_in_outlined,
                           label: '装箱单验证',
-                          accentColor: Color(0xFF00B8A9),
+                          accentColor: const Color(0xFF00B8A9),
+                          onSelected: _openScanValidation,
                         ),
                         _DrawerMenuItemData(
                           icon: Icons.rate_review_outlined,
                           label: '工单点评',
-                          accentColor: Color(0xFFF2994A),
+                          accentColor: const Color(0xFFF2994A),
+                          onSelected: _openReview,
                         ),
                       ],
                     ),
-                    SizedBox(height: 18),
+                    const SizedBox(height: 18),
                     _DrawerSection(
                       title: '问题与反馈',
                       columns: 2,
@@ -53,12 +65,14 @@ class WorkOrdersDrawer extends StatelessWidget {
                         _DrawerMenuItemData(
                           icon: Icons.help_outline,
                           label: '常见问题',
-                          accentColor: Color(0xFF2A8BF2),
+                          accentColor: const Color(0xFF2A8BF2),
+                          onSelected: _openFaq,
                         ),
                         _DrawerMenuItemData(
                           icon: Icons.edit_note_outlined,
                           label: '我要吐槽',
-                          accentColor: Color(0xFFEB5757),
+                          accentColor: const Color(0xFFEB5757),
+                          onSelected: (context) => _openFeedback(context),
                         ),
                       ],
                     ),
@@ -78,80 +92,89 @@ class WorkOrdersDrawer extends StatelessWidget {
 }
 
 class _DrawerProfileHeader extends StatelessWidget {
-  const _DrawerProfileHeader();
+  final VoidCallback onBadgeTap;
+  final VoidCallback onBadgeButtonTap;
+
+  const _DrawerProfileHeader({
+    required this.onBadgeTap,
+    required this.onBadgeButtonTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [Color(0xFF2A8BF2), Color(0xFF53A0FD)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+      child: GestureDetector(
+        onTap: onBadgeTap,
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Color(0xFF2A8BF2), Color(0xFF53A0FD)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(24),
           ),
-          borderRadius: BorderRadius.circular(24),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Container(
-                  height: 56,
-                  width: 56,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white.withOpacity(0.4)),
-                  ),
-                  child: const CircleAvatar(
-                    backgroundColor: Colors.white,
-                    child: Text(
-                      '陈',
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF2A8BF2),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                    height: 56,
+                    width: 56,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white.withOpacity(0.4)),
+                    ),
+                    child: const CircleAvatar(
+                      backgroundColor: Colors.white,
+                      child: Text(
+                        '陈',
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF2A8BF2),
+                        ),
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        '陈昊炜',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.w700,
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: const [
+                        Text(
+                          '陈昊炜',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 6),
-                      const Text(
-                        'FSR000190',
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
+                        SizedBox(height: 6),
+                        Text(
+                          'FSR000190',
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                const SizedBox(width: 16),
-                _DrawerBadgeButton(onTap: () {}),
-              ],
-            ),
-            const SizedBox(height: 18),
-          ],
+                  const SizedBox(width: 16),
+                  _DrawerBadgeButton(onTap: onBadgeButtonTap),
+                ],
+              ),
+              const SizedBox(height: 18),
+            ],
+          ),
         ),
       ),
     );
@@ -261,11 +284,13 @@ class _DrawerMenuItemData {
   final IconData icon;
   final String label;
   final Color accentColor;
+  final void Function(BuildContext context)? onSelected;
 
   const _DrawerMenuItemData({
     required this.icon,
     required this.label,
     required this.accentColor,
+    this.onSelected,
   });
 }
 
@@ -276,43 +301,125 @@ class _DrawerMenuItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 16),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF7F9FE),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: data.accentColor.withOpacity(0.18)),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            height: 46,
-            width: 46,
-            decoration: BoxDecoration(
-              color: data.accentColor.withOpacity(0.12),
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: Icon(
-              data.icon,
-              color: data.accentColor,
-              size: 24,
-            ),
+        onTap: data.onSelected == null ? null : () => data.onSelected!(context),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF7F9FE),
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: data.accentColor.withOpacity(0.18)),
           ),
-          const SizedBox(height: 10),
-          Text(
-            data.label,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF384250),
-            ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                height: 46,
+                width: 46,
+                decoration: BoxDecoration(
+                  color: data.accentColor.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Icon(
+                  data.icon,
+                  color: data.accentColor,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                data.label,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF384250),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
+}
+
+void _openFeedback(BuildContext context) {
+  final navigator = Navigator.of(context);
+  navigator.pop();
+  navigator.push(
+    MaterialPageRoute(builder: (_) => const FeedbackPage()),
+  );
+}
+
+void _openBadge(BuildContext context) {
+  final navigator = Navigator.of(context);
+  navigator.pop();
+  navigator.push(
+    MaterialPageRoute(
+      builder: (_) => const EngineerBadgePage(
+        badge: EngineerBadge(
+          name: '陈昊炜',
+          badgeId: 'L24118',
+          title: '联想服务认证工程师',
+          ratingLabel: '新锐工程师',
+          serviceCount: 157,
+          ratingScore: 4.9,
+          experienceYears: 10,
+          certifications: ['PC认证资质'],
+        ),
+      ),
+    ),
+  );
+}
+
+void _openHostInfo(BuildContext context) {
+  final navigator = Navigator.of(context);
+  navigator.pop();
+  navigator.push(
+    MaterialPageRoute(builder: (_) => const HostInfoPage()),
+  );
+}
+
+void _openScanValidation(BuildContext context) {
+  final navigator = Navigator.of(context);
+  navigator.pop();
+  navigator.push(
+    MaterialPageRoute(builder: (_) => const ScanValidationPage()),
+  );
+}
+
+void _openFaq(BuildContext context) {
+  final navigator = Navigator.of(context);
+  navigator.pop();
+  navigator.push(
+    MaterialPageRoute(builder: (_) => const FaqPage()),
+  );
+}
+
+void _openReview(BuildContext context) {
+  final navigator = Navigator.of(context);
+  navigator.pop();
+  navigator.push(
+    MaterialPageRoute(builder: (_) => const WorkOrderReviewPage()),
+  );
+}
+
+void _showPlaceholder(BuildContext context, String label) {
+  final navigator = Navigator.of(context);
+  final messenger = ScaffoldMessenger.of(context);
+  navigator.pop();
+  messenger
+    ..hideCurrentSnackBar()
+    ..showSnackBar(
+      SnackBar(
+        content: Text('$label 功能正在建设中'),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
 }
 
 class _DrawerSettingsButton extends StatelessWidget {
