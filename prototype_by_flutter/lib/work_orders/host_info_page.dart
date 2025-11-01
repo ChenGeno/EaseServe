@@ -15,6 +15,7 @@ class _HostInfoPageState extends State<HostInfoPage>
   bool _showSearchBar = false;
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
+  bool _pendingOpenSearch = false;
 
   @override
   void initState() {
@@ -41,9 +42,13 @@ class _HostInfoPageState extends State<HostInfoPage>
         _searchController.clear();
         _searchFocusNode.unfocus();
       });
-    } else if (_tabController.index == 1 && _showSearchBar) {
-      // ensure focus returns when switching back
-      _searchFocusNode.requestFocus();
+    } else if (_tabController.index == 1) {
+      if (_pendingOpenSearch) {
+        _pendingOpenSearch = false;
+        _toggleSearchBar();
+      } else if (_showSearchBar) {
+        _searchFocusNode.requestFocus();
+      }
     }
   }
 
@@ -141,8 +146,8 @@ class _HostInfoPageState extends State<HostInfoPage>
 
   void _toggleSearchBar() {
     if (_tabController.index != 1) {
+      _pendingOpenSearch = true;
       _tabController.animateTo(1);
-      Future.microtask(() => _toggleSearchBar());
       return;
     }
     setState(() {

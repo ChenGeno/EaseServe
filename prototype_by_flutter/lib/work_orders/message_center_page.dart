@@ -110,6 +110,28 @@ class _MessageCenterPageState extends State<MessageCenterPage>
                         },
                       ),
                     ),
+                    const SizedBox(width: 8),
+                    Builder(
+                      builder: (buttonContext) => TextButton(
+                        onPressed: () => _markAllAsRead(buttonContext),
+                        style: TextButton.styleFrom(
+                          foregroundColor: const Color(0xFF2A8BF2),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
+                          minimumSize: const Size(0, 36),
+                        ),
+                        child: const Text(
+                          '全部已读',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF2A8BF2),
+                          ),
+                        ),
+                      ),
+                    ),
                     const SizedBox(width: 12),
                     _MessageFilterButton(
                       label: '全部',
@@ -150,6 +172,55 @@ class _MessageCenterPageState extends State<MessageCenterPage>
   void _setUnreadOnly(bool value) {
     if (_showUnreadOnly == value) return;
     setState(() => _showUnreadOnly = value);
+  }
+
+  void _markAllAsRead(BuildContext context) {
+    final controller = DefaultTabController.of(context);
+    if (controller == null) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          const SnackBar(
+            content: Text('暂时无法获取当前栏目'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      return;
+    }
+    final currentIndex = controller.index;
+
+    final currentMessages =
+        currentIndex == 0 ? _orderMessages : _systemMessages;
+
+    final unreadMessages =
+        currentMessages.where((message) => message.unread).toList();
+
+    if (unreadMessages.isEmpty) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          const SnackBar(
+            content: Text('当前栏目没有未读消息'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      return;
+    }
+
+    for (final message in unreadMessages) {
+      message.unread = false;
+    }
+
+    setState(() {});
+
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text('已标记${currentIndex == 0 ? '所有工单消息' : '所有系统消息'}为已读'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
   }
 }
 
@@ -395,10 +466,10 @@ class _MessageItem {
   final String title;
   final String subtitle;
   final String timeLabel;
-  final bool unread;
+  bool unread;
   final Color iconColor;
 
-  const _MessageItem({
+  _MessageItem({
     required this.title,
     required this.subtitle,
     required this.timeLabel,

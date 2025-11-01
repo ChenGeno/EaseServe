@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../settings/app_settings_page.dart';
+import '../settings/about_page.dart';
+import '../settings/default_navigation_map_page.dart';
 import 'engineer_badge_page.dart';
 import 'feedback_page.dart';
 import 'host_info_page.dart';
@@ -76,13 +77,16 @@ class WorkOrdersDrawer extends StatelessWidget {
                         ),
                       ],
                     ),
+                    const SizedBox(height: 18),
+                    const _DrawerConfigSection(),
+                    const SizedBox(height: 18),
                   ],
                 ),
               ),
             ),
             const Padding(
               padding: EdgeInsets.fromLTRB(16, 0, 16, 16),
-              child: _DrawerSettingsButton(),
+              child: _LogoutButton(),
             ),
           ],
         ),
@@ -422,35 +426,174 @@ void _showPlaceholder(BuildContext context, String label) {
     );
 }
 
-class _DrawerSettingsButton extends StatelessWidget {
-  const _DrawerSettingsButton();
+class _DrawerConfigSection extends StatelessWidget {
+  const _DrawerConfigSection();
 
   @override
   Widget build(BuildContext context) {
-    final navigator = Navigator.of(context);
-
-    return OutlinedButton(
-      onPressed: () {
-        navigator.pop();
-        navigator.push(
-          MaterialPageRoute(
-            builder: (_) => const AppSettingsPage(),
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 18),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(22),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0F000000),
+            blurRadius: 18,
+            offset: Offset(0, 10),
           ),
-        );
-      },
-      style: OutlinedButton.styleFrom(
-        padding: const EdgeInsets.symmetric(vertical: 14),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        side: const BorderSide(color: Color(0xFF2A8BF2)),
+        ],
       ),
-      child: const Text(
-        '应用设置',
-        style: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w700,
-          color: Color(0xFF2A8BF2),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            '应用配置',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF2A2E39),
+            ),
+          ),
+          const SizedBox(height: 18),
+          Row(
+            children: const [
+              Expanded(
+                child: _ConfigTile(
+                  icon: Icons.navigation_outlined,
+                  label: '默认导航地图',
+                  accentColor: Color(0xFF2A8BF2),
+                  onTap: _DrawerConfigSection._handleDefaultMap,
+                ),
+              ),
+              SizedBox(width: 12),
+              Expanded(
+                child: _ConfigTile(
+                  icon: Icons.info_outline,
+                  label: '关于服务无忧',
+                  accentColor: Color(0xFFF2994A),
+                  onTap: _DrawerConfigSection._handleAbout,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  static void _handleDefaultMap(BuildContext context) {
+    final navigator = Navigator.of(context);
+    navigator.pop();
+    navigator.push(
+      MaterialPageRoute(builder: (_) => const DefaultNavigationMapPage()),
+    );
+  }
+
+  static void _handleAbout(BuildContext context) {
+    final navigator = Navigator.of(context);
+    navigator.pop();
+    navigator.push(
+      MaterialPageRoute(builder: (_) => const AboutPage()),
+    );
+  }
+}
+
+class _ConfigTile extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final void Function(BuildContext context) onTap;
+  final Color accentColor;
+
+  const _ConfigTile({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    this.accentColor = const Color(0xFF2A8BF2),
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => onTap(context),
+        borderRadius: BorderRadius.circular(18),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF7F9FE),
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: accentColor.withOpacity(0.18)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                height: 46,
+                width: 46,
+                decoration: BoxDecoration(
+                  color: accentColor.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Icon(icon, color: accentColor, size: 24),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                label,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF384250),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _LogoutButton extends StatelessWidget {
+  const _LogoutButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: OutlinedButton.icon(
+        onPressed: () {
+          Navigator.of(context).pop();
+          final messenger = ScaffoldMessenger.of(context);
+          messenger
+            ..hideCurrentSnackBar()
+            ..showSnackBar(
+              const SnackBar(
+                content: Text('已退出登录（示例）'),
+                behavior: SnackBarBehavior.floating,
+              ),
+            );
+        },
+        icon: const Icon(Icons.logout, color: Color(0xFFEB5757)),
+        label: const Text(
+          '退出登录',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+            color: Color(0xFFEB5757),
+          ),
+        ),
+        style: OutlinedButton.styleFrom(
+          backgroundColor: Colors.white,
+          foregroundColor: const Color(0xFFEB5757),
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          side: const BorderSide(color: Color(0xFFEB5757), width: 1.4),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+          ),
         ),
       ),
     );
